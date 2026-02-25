@@ -1,18 +1,22 @@
-from flask import Flask, render_template, request, send_from_directory
+from flask import Flask, render_template, request, send_file
 from encrypt_qr import encrypt_message, generate_qr
 from decrypt_qr import decrypt_message
+import os
 
 app = Flask(__name__)
 
-# Temporary storage (for demo project)
+# Temporary storage (NOTE: resets if server restarts)
 encrypted_data_store = ""
 
-# Serve QR image
-from flask import send_file
 
+# Serve QR image from /tmp (Render writable directory)
 @app.route('/secure_qr.png')
 def serve_qr():
-    return send_file("/tmp/secure_qr.png")
+    file_path = "/tmp/secure_qr.png"
+    if os.path.exists(file_path):
+        return send_file(file_path)
+    else:
+        return "QR Code not found. Please generate again."
 
 
 # HOME PAGE
@@ -30,14 +34,15 @@ def index():
                 encrypted = encrypt_message(message, password)
                 encrypted_data_store = encrypted
 
-                # ⚠️ CHANGE THIS TO YOUR PC IP
+                # Generate QR pointing to your live decrypt page
                 generate_qr("https://secure-qr-code-generator.onrender.com/decrypt")
+
                 qr_generated = True
 
     return render_template("index.html", qr_generated=qr_generated)
 
 
-# DECRYPT PAGE (Opened on Mobile)
+# DECRYPT PAGE
 @app.route("/decrypt", methods=["GET", "POST"])
 def decrypt_page():
     global encrypted_data_store
@@ -55,5 +60,7 @@ def decrypt_page():
     return render_template("decrypt.html", result=result)
 
 
+# IMPORTANT: Render requires dynamic PORT
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host="0.0.0.0", port=port)
