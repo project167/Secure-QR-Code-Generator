@@ -14,4 +14,4 @@ def encrypt_message(message, password):
 
 def generate_qr(data):
     img = qrcode.make(data)
-    img.save("secure_qr.png")
+    img.save("/tmp/secure_qr.png")

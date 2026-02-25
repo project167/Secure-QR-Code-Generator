@@ -8,9 +8,11 @@ app = Flask(__name__)
 encrypted_data_store = ""
 
 # Serve QR image
+from flask import send_file
+
 @app.route('/secure_qr.png')
 def serve_qr():
-    return send_from_directory('.', 'secure_qr.png')
+    return send_file("/tmp/secure_qr.png")
 
 
 # HOME PAGE
