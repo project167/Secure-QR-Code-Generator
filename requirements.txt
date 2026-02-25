@@ -1,4 +1,5 @@
-flask
-cryptography
+Flask
 qrcode
+pillow
 gunicorn
+cryptography
