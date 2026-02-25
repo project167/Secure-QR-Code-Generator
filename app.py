@@ -29,8 +29,7 @@ def index():
                 encrypted_data_store = encrypted
 
                 # ⚠️ CHANGE THIS TO YOUR PC IP
-                generate_qr("http://192.168.1.5:5000/decrypt")
-
+                generate_qr("https://secure-qr-code-generator.onrender.com/decrypt")
                 qr_generated = True
 
     return render_template("index.html", qr_generated=qr_generated)
