@@ -7,11 +7,15 @@
 
 <body>
 
-{% if not qr_generated %}
+{% if not qr_image %}
 
     <!-- SHOW FORM BEFORE GENERATING -->
     <div class="card">
         <h1>Secure QR Code Generator</h1>
+
+        {% if error %}
+            <p style="color:red;">{{ error }}</p>
+        {% endif %}
 
         <form method="POST">
 
@@ -26,12 +30,8 @@
                 placeholder="Enter Password"
                 required>
 
-            <button type="submit" name="generate" class="btn-generate">
+            <button type="submit" class="btn-generate">
                 Generate QR
-            </button>
-
-            <button type="submit" name="decrypt" class="btn-decrypt">
-                Scan & Decrypt
             </button>
 
         </form>
@@ -39,9 +39,17 @@
 
 {% else %}
 
-    <!-- SHOW ONLY QR AFTER GENERATING -->
+    <!-- SHOW QR AFTER GENERATING -->
     <div class="qr-only">
-        <img src="/secure_qr.png" class="qr-image-large">
+        <h2>Scan This QR Code</h2>
+
+        <img 
+            src="data:image/png;base64,{{ qr_image }}" 
+            class="qr-image-large">
+
+        <br><br>
+
+        <a href="/" class="btn-generate">Generate Another</a>
     </div>
 
 {% endif %}

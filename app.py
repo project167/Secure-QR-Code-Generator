@@ -6,6 +6,7 @@ import qrcode
 import os
 import uuid
 import json
+import io
 
 app = Flask(__name__)
 
@@ -26,10 +27,13 @@ def decrypt_message(encrypted_message, password):
     cipher = Fernet(key)
     return cipher.decrypt(encrypted_message.encode()).decode()
 
-# --------- Generate QR ---------
+# --------- Generate QR (IN MEMORY - No File Saving) ---------
 def generate_qr(data):
     img = qrcode.make(data)
-    img.save("static/qr.png")
+    buffer = io.BytesIO()
+    img.save(buffer, format="PNG")
+    buffer.seek(0)
+    return base64.b64encode(buffer.getvalue()).decode()
 
 # --------- HOME ROUTE ---------
 @app.route("/", methods=["GET", "POST"])
@@ -46,16 +50,16 @@ def index():
         # Create unique ID
         unique_id = str(uuid.uuid4())
 
-        # Store encrypted data in temporary file
+        # Store encrypted data in temporary file (Render supports /tmp)
         data_path = f"/tmp/{unique_id}.json"
         with open(data_path, "w") as f:
             json.dump({"encrypted": encrypted}, f)
 
         # Generate QR with unique link
         qr_link = f"https://secure-qr-code-generator.onrender.com/decrypt/{unique_id}"
-        generate_qr(qr_link)
+        qr_image = generate_qr(qr_link)
 
-        return render_template("index.html", qr_generated=True)
+        return render_template("index.html", qr_image=qr_image)
 
     return render_template("index.html")
 
@@ -85,7 +89,7 @@ def decrypt_page(unique_id):
     return render_template("decrypt.html", result=result)
 
 
-# --------- Run App ---------
+# --------- Run App (Only for Local Testing) ---------
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 10000))
+    port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
