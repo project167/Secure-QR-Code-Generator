@@ -4,53 +4,31 @@
     <title>Secure QR System</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-
 <body>
 
 {% if not qr_image %}
 
-    <!-- SHOW FORM BEFORE GENERATING -->
-    <div class="card">
-        <h1>Secure QR Code Generator</h1>
+<div class="card">
+    <h1>Secure QR Code Generator</h1>
+    {% if error %}
+        <p style="color:red;">{{ error }}</p>
+    {% endif %}
 
-        {% if error %}
-            <p style="color:red;">{{ error }}</p>
-        {% endif %}
-
-        <form method="POST">
-
-            <textarea 
-                name="message" 
-                placeholder="Enter Confidential Message"
-                required></textarea>
-
-            <input 
-                type="password" 
-                name="password" 
-                placeholder="Enter Password"
-                required>
-
-            <button type="submit" class="btn-generate">
-                Generate QR
-            </button>
-
-        </form>
-    </div>
+    <form method="POST">
+        <textarea name="message" placeholder="Enter Confidential Message" required></textarea>
+        <input type="password" name="password" placeholder="Enter Password" required>
+        <button type="submit">Generate QR</button>
+    </form>
+</div>
 
 {% else %}
 
-    <!-- SHOW QR AFTER GENERATING -->
-    <div class="qr-only">
-        <h2>Scan This QR Code</h2>
-
-        <img 
-            src="data:image/png;base64,{{ qr_image }}" 
-            class="qr-image-large">
-
-        <br><br>
-
-        <a href="/" class="btn-generate">Generate Another</a>
-    </div>
+<div class="qr-only">
+    <h2>Scan This QR Code</h2>
+    <img src="data:image/png;base64,{{ qr_image }}">
+    <br><br>
+    <a href="/">Generate Another</a>
+</div>
 
 {% endif %}
 

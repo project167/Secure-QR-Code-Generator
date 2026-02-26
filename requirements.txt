@@ -1,4 +1,4 @@
-# Force rebuild
+# Force rebuild for Render free plan
 Flask
 cryptography
 qrcode

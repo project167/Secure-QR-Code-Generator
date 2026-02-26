@@ -27,7 +27,7 @@ def decrypt_message(encrypted_message, password):
     cipher = Fernet(key)
     return cipher.decrypt(encrypted_message.encode()).decode()
 
-# --------- Generate QR (IN MEMORY - No File Saving) ---------
+# --------- Generate QR in-memory ---------
 def generate_qr(data):
     img = qrcode.make(data)
     buffer = io.BytesIO()
@@ -35,7 +35,7 @@ def generate_qr(data):
     buffer.seek(0)
     return base64.b64encode(buffer.getvalue()).decode()
 
-# --------- HOME ROUTE ---------
+# --------- Home Route ---------
 @app.route("/", methods=["GET", "POST"])
 def index():
     if request.method == "POST":
@@ -46,16 +46,12 @@ def index():
             return render_template("index.html", error="Please enter all fields")
 
         encrypted = encrypt_message(message, password)
-
-        # Create unique ID
         unique_id = str(uuid.uuid4())
-
-        # Store encrypted data in temporary file (Render supports /tmp)
         data_path = f"/tmp/{unique_id}.json"
+
         with open(data_path, "w") as f:
             json.dump({"encrypted": encrypted}, f)
 
-        # Generate QR with unique link
         qr_link = f"https://secure-qr-code-generator.onrender.com/decrypt/{unique_id}"
         qr_image = generate_qr(qr_link)
 
@@ -63,8 +59,7 @@ def index():
 
     return render_template("index.html")
 
-
-# --------- DECRYPT ROUTE ---------
+# --------- Decrypt Route ---------
 @app.route("/decrypt/<unique_id>", methods=["GET", "POST"])
 def decrypt_page(unique_id):
     result = ""
@@ -75,7 +70,6 @@ def decrypt_page(unique_id):
 
     if request.method == "POST":
         password = request.form.get("password")
-
         with open(data_path, "r") as f:
             data = json.load(f)
 
@@ -88,8 +82,7 @@ def decrypt_page(unique_id):
 
     return render_template("decrypt.html", result=result)
 
-
-# --------- Run App (Only for Local Testing) ---------
+# --------- Run App Locally ---------
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)

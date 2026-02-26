@@ -3,45 +3,16 @@
 <head>
     <title>Decrypt QR</title>
     <style>
-        body {
-            font-family: Arial;
-            background: #111;
-            color: white;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-
-        .box {
-            background: white;
-            color: black;
-            padding: 40px;
-            border-radius: 15px;
-            width: 300px;
-            text-align: center;
-        }
-
-        input {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 15px;
-        }
-
-        button {
-            width: 100%;
-            padding: 10px;
-            background: #d71920;
-            color: white;
-            border: none;
-        }
+        body { font-family: Arial; background: #111; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        .box { background: white; color: black; padding: 40px; border-radius: 15px; width: 300px; text-align: center; }
+        input { width: 100%; padding: 10px; margin-bottom: 15px; }
+        button { width: 100%; padding: 10px; background: #d71920; color: white; border: none; }
     </style>
 </head>
 <body>
 
 <div class="box">
     <h2>Enter Password</h2>
-
     <form method="POST">
         <input type="password" name="password" required>
         <button type="submit">Decrypt</button>
