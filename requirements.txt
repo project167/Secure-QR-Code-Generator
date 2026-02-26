@@ -1,6 +1,5 @@
-# Force rebuild for Render free plan
-Flask
+flask
 cryptography
 qrcode
-Pillow
+pillow
 gunicorn
