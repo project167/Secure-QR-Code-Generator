@@ -1,36 +1,104 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Secure QR System</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>Secure QR Code Generator</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #8B0000, #B22222);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            width: 350px;
+            text-align: center;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+        }
+
+        h2 {
+            margin-bottom: 25px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background: #B22222;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background: #8B0000;
+            transform: scale(1.05);
+        }
+
+        .qr-box {
+            margin-top: 20px;
+        }
+
+        .qr-box img {
+            width: 200px;
+            border-radius: 10px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        }
+
+        .error {
+            color: red;
+            margin-bottom: 15px;
+        }
+
+    </style>
 </head>
+
 <body>
 
-{% if not qr_image %}
+<div class="container">
 
-<div class="card">
-    <h1>Secure QR Code Generator</h1>
-    {% if error %}
-        <p style="color:red;">{{ error }}</p>
+    <h2>Secure QR Generator</h2>
+
+    {% if not qr_generated %}
+
+        {% if error %}
+            <div class="error">{{ error }}</div>
+        {% endif %}
+
+        <form method="POST">
+            <input type="text" name="message" placeholder="Enter Confidential Message">
+            <input type="password" name="password" placeholder="Enter Password">
+            <button type="submit">Generate QR</button>
+        </form>
+
     {% endif %}
 
-    <form method="POST">
-        <textarea name="message" placeholder="Enter Confidential Message" required></textarea>
-        <input type="password" name="password" placeholder="Enter Password" required>
-        <button type="submit">Generate QR</button>
-    </form>
+    {% if qr_generated %}
+        <div class="qr-box">
+            <img src="/qr" alt="QR Code">
+        </div>
+    {% endif %}
+
 </div>
-
-{% else %}
-
-<div class="qr-only">
-    <h2>Scan This QR Code</h2>
-    <img src="data:image/png;base64,{{ qr_image }}">
-    <br><br>
-    <a href="/">Generate Another</a>
-</div>
-
-{% endif %}
 
 </body>
 </html>

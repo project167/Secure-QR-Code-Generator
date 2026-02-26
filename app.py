@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, send_file
 from cryptography.fernet import Fernet
 import base64
 import hashlib
@@ -6,36 +6,37 @@ import qrcode
 import os
 import uuid
 import json
-import io
 
 app = Flask(__name__)
 
-# --------- Helper: Generate Key From Password ---------
+# ---------- KEY GENERATION ----------
 def generate_key(password):
     key = hashlib.sha256(password.encode()).digest()
     return base64.urlsafe_b64encode(key)
 
-# --------- Encrypt Function ---------
+# ---------- ENCRYPT ----------
 def encrypt_message(message, password):
     key = generate_key(password)
     cipher = Fernet(key)
     return cipher.encrypt(message.encode()).decode()
 
-# --------- Decrypt Function ---------
+# ---------- DECRYPT ----------
 def decrypt_message(encrypted_message, password):
     key = generate_key(password)
     cipher = Fernet(key)
     return cipher.decrypt(encrypted_message.encode()).decode()
 
-# --------- Generate QR in-memory ---------
-def generate_qr(data):
-    img = qrcode.make(data)
-    buffer = io.BytesIO()
-    img.save(buffer, format="PNG")
-    buffer.seek(0)
-    return base64.b64encode(buffer.getvalue()).decode()
+# ---------- GENERATE QR ----------
+def generate_qr(link):
+    img = qrcode.make(link)
+    img.save("/tmp/qr.png")
 
-# --------- Home Route ---------
+# ---------- SERVE QR ----------
+@app.route("/qr")
+def serve_qr():
+    return send_file("/tmp/qr.png", mimetype="image/png")
+
+# ---------- HOME ----------
 @app.route("/", methods=["GET", "POST"])
 def index():
     if request.method == "POST":
@@ -43,23 +44,27 @@ def index():
         password = request.form.get("password")
 
         if not message or not password:
-            return render_template("index.html", error="Please enter all fields")
+            return render_template("index.html", error="Enter all fields")
 
         encrypted = encrypt_message(message, password)
-        unique_id = str(uuid.uuid4())
-        data_path = f"/tmp/{unique_id}.json"
 
+        # Unique ID for each message
+        unique_id = str(uuid.uuid4())
+
+        # Save encrypted message in /tmp
+        data_path = f"/tmp/{unique_id}.json"
         with open(data_path, "w") as f:
             json.dump({"encrypted": encrypted}, f)
 
+        # Generate QR with unique link
         qr_link = f"https://secure-qr-code-generator.onrender.com/decrypt/{unique_id}"
-        qr_image = generate_qr(qr_link)
+        generate_qr(qr_link)
 
-        return render_template("index.html", qr_image=qr_image)
+        return render_template("index.html", qr_generated=True)
 
     return render_template("index.html")
 
-# --------- Decrypt Route ---------
+# ---------- DECRYPT ----------
 @app.route("/decrypt/<unique_id>", methods=["GET", "POST"])
 def decrypt_page(unique_id):
     result = ""
@@ -70,6 +75,7 @@ def decrypt_page(unique_id):
 
     if request.method == "POST":
         password = request.form.get("password")
+
         with open(data_path, "r") as f:
             data = json.load(f)
 
@@ -82,7 +88,6 @@ def decrypt_page(unique_id):
 
     return render_template("decrypt.html", result=result)
 
-# --------- Run App Locally ---------
+# ---------- RUN ----------
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
+    app.run()
