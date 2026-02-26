@@ -1,5 +1,5 @@
 Flask
-qrcode
-pillow
-gunicorn
 cryptography
+qrcode
+Pillow
+gunicorn
