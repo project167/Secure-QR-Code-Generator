@@ -1,61 +1,84 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for
 from cryptography.fernet import Fernet
-import base64
-import hashlib
 import qrcode
-import io
+import uuid
+import os
 
 app = Flask(__name__)
 
-# Generate key from password
-def generate_key(password):
-    key = hashlib.sha256(password.encode()).digest()
-    return base64.urlsafe_b64encode(key)
+# Temporary storage (resets if server restarts)
+messages = {}
 
-# Encrypt
-def encrypt_message(message, password):
-    key = generate_key(password)
-    cipher = Fernet(key)
-    return cipher.encrypt(message.encode()).decode()
+# ---------------- HOME PAGE ----------------
+@app.route('/')
+def home():
+    return render_template("index.html")
 
-# Decrypt
-def decrypt_message(encrypted_message, password):
-    key = generate_key(password)
-    cipher = Fernet(key)
-    return cipher.decrypt(encrypted_message.encode()).decode()
+# ---------------- GENERATE QR ----------------
+@app.route('/generate', methods=['POST'])
+def generate():
 
-@app.route("/", methods=["GET", "POST"])
-def index():
-    qr_image = None
-
-    if request.method == "POST":
-        message = request.form.get("message")
-        password = request.form.get("password")
-
-        if message and password:
-            encrypted = encrypt_message(message, password)
-
-            # QR contains encrypted text directly
-            img = qrcode.make(encrypted)
-
-            buffer = io.BytesIO()
-            img.save(buffer, format="PNG")
-            buffer.seek(0)
-
-            qr_image = base64.b64encode(buffer.getvalue()).decode()
-
-    return render_template("index.html", qr_image=qr_image)
-
-@app.route("/decrypt", methods=["POST"])
-def decrypt():
-    encrypted = request.form.get("encrypted")
+    message = request.form.get("message")
     password = request.form.get("password")
 
-    try:
-        message = decrypt_message(encrypted, password)
-        return f"<h2>Decrypted Message:</h2><p>{message}</p>"
-    except:
-        return "<h2>Invalid Password</h2>"
+    if not message or not password:
+        return "Message and password required"
 
+    # Create encryption key
+    key = Fernet.generate_key()
+    cipher = Fernet(key)
+
+    # Encrypt message
+    encrypted_message = cipher.encrypt(message.encode())
+
+    # Create unique ID
+    unique_id = str(uuid.uuid4())
+
+    # Store data temporarily
+    messages[unique_id] = {
+        "encrypted": encrypted_message,
+        "key": key,
+        "password": password
+    }
+
+    # Create QR URL
+    qr_url = request.host_url + "view/" + unique_id
+
+    # Generate QR
+    img = qrcode.make(qr_url)
+
+    # Ensure static folder exists
+    if not os.path.exists("static"):
+        os.makedirs("static")
+
+    img.save("static/qr.png")
+
+    return render_template("qr.html")
+
+
+# ---------------- PASSWORD PAGE ----------------
+@app.route('/view/<unique_id>', methods=['GET', 'POST'])
+def view_message(unique_id):
+
+    if unique_id not in messages:
+        return "Invalid or expired QR code"
+
+    if request.method == "POST":
+        entered_password = request.form.get("password")
+
+        if entered_password == messages[unique_id]["password"]:
+            cipher = Fernet(messages[unique_id]["key"])
+            decrypted_message = cipher.decrypt(
+                messages[unique_id]["encrypted"]
+            ).decode()
+
+            return render_template("message.html", message=decrypted_message)
+        else:
+            return render_template("password.html", error="Invalid Password")
+
+    return render_template("password.html")
+
+
+# ---------------- RUN APP ----------------
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)

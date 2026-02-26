@@ -7,13 +7,10 @@
 
 <body>
 
-{% if not qr_generated %}
-
-    <!-- SHOW FORM BEFORE GENERATING -->
     <div class="card">
         <h1>Secure QR Code Generator</h1>
 
-        <form method="POST">
+        <form method="POST" action="/generate">
 
             <textarea 
                 name="message" 
@@ -26,25 +23,12 @@
                 placeholder="Enter Password"
                 required>
 
-            <button type="submit" name="generate" class="btn-generate">
+            <button type="submit" class="btn-generate">
                 Generate QR
-            </button>
-
-            <button type="submit" name="decrypt" class="btn-decrypt">
-                Scan & Decrypt
             </button>
 
         </form>
     </div>
-
-{% else %}
-
-    <!-- SHOW ONLY QR AFTER GENERATING -->
-    <div class="qr-only">
-        <img src="/secure_qr.png" class="qr-image-large">
-    </div>
-
-{% endif %}
 
 </body>
 </html>

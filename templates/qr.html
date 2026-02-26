@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Your Secure QR</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <div class="qr-only">
+        <h2>Scan This QR Code</h2>
+        <img src="{{ url_for('static', filename='qr.png') }}" class="qr-image-large">
+    </div>
+
+</body>
+</html>
