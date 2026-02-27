@@ -3,10 +3,10 @@ from cryptography.fernet import Fernet
 import qrcode
 import io
 import base64
+import urllib.parse
 
 app = Flask(__name__)
 
-# Temporary storage (resets when server restarts)
 messages = {}
 
 @app.route("/")
@@ -22,22 +22,21 @@ def generate():
     if not message or not password:
         return "Message and password required"
 
-    # Generate encryption key
     key = Fernet.generate_key()
     f = Fernet(key)
 
     encrypted_message = f.encrypt(message.encode()).decode()
 
-    # Store encrypted message with password and key
+    # URL safe encode
+    safe_token = urllib.parse.quote(encrypted_message)
+
     messages[encrypted_message] = {
         "password": password,
         "key": key.decode()
     }
 
-    # Create decrypt link
-    link = request.url_root + "decrypt/" + encrypted_message
+    link = request.url_root + "decrypt/" + safe_token
 
-    # Generate QR
     qr = qrcode.make(link)
 
     buffer = io.BytesIO()
@@ -49,8 +48,11 @@ def generate():
     return render_template("qr.html", qr_image=img_str)
 
 
-@app.route("/decrypt/<token>", methods=["GET", "POST"])
+@app.route("/decrypt/<path:token>", methods=["GET", "POST"])
 def decrypt(token):
+    # Decode URL safe token
+    token = urllib.parse.unquote(token)
+
     if token not in messages:
         return "Invalid or expired QR"
 
