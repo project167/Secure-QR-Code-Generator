@@ -28,21 +28,80 @@ body {
     text-align: center;
     box-shadow: 0 30px 80px rgba(255, 0, 0, 0.35);
     backdrop-filter: blur(10px);
-    animation: fadeIn 0.6s ease-in-out;
 }
 
-h1 {
-    color: #ffffff;
-    margin-bottom: 30px;
-    font-weight: 800;
-    font-size: 36px;
+/* ── LOADING SPINNER SCREEN ── */
+#loadingScreen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.spinner {
+    width: 70px;
+    height: 70px;
+    border: 6px solid rgba(255,255,255,0.1);
+    border-top: 6px solid #ff1a1a;
+    border-radius: 50%;
+    animation: spin 0.9s linear infinite;
+}
+
+.loading-text {
+    color: #888;
+    font-size: 16px;
+    letter-spacing: 2px;
     text-transform: uppercase;
-    letter-spacing: 3px;
 }
 
-.unlock-icon {
-    font-size: 60px;
-    margin-bottom: 20px;
+/* ── GREEN TICK SCREEN ── */
+#successScreen {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.tick-circle {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    background: #1a1a1a;
+    border: 5px solid #00c853;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.tick-circle svg {
+    width: 45px;
+    height: 45px;
+    stroke: #00c853;
+    stroke-width: 3;
+    stroke-dasharray: 60;
+    stroke-dashoffset: 60;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    animation: drawTick 0.4s ease forwards 0.2s;
+}
+
+.success-text {
+    color: #00c853;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+/* ── MESSAGE SCREEN ── */
+#messageScreen {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 25px;
+    animation: fadeUp 0.5s ease;
 }
 
 .message-box {
@@ -52,14 +111,15 @@ h1 {
     border-radius: 18px;
     font-size: 20px;
     line-height: 1.6;
-    margin-bottom: 35px;
     word-break: break-word;
     text-align: left;
+    width: 100%;
 }
 
 .btn-group {
     display: flex;
     gap: 15px;
+    width: 100%;
 }
 
 button, a.btn {
@@ -98,7 +158,21 @@ button:active, a.btn:active {
     transform: scale(0.95);
 }
 
-@keyframes fadeIn {
+/* ── ANIMATIONS ── */
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes popIn {
+    from { transform: scale(0); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+@keyframes drawTick {
+    to { stroke-dashoffset: 0; }
+}
+
+@keyframes fadeUp {
     from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
 }
@@ -107,26 +181,57 @@ button:active, a.btn:active {
 
 <body>
 <div class="card">
-    <div class="unlock-icon">🔓</div>
-    <h1>Secret Message</h1>
 
-    <div class="message-box">{{ message }}</div>
-
-    <div class="btn-group">
-        <button onclick="copyMessage()">Copy Message</button>
-        <a href="/" class="btn">New QR</a>
+    <!-- STEP 1: Loading spinner -->
+    <div id="loadingScreen">
+        <div class="spinner"></div>
+        <p class="loading-text">Decrypting...</p>
     </div>
+
+    <!-- STEP 2: Green tick -->
+    <div id="successScreen">
+        <div class="tick-circle">
+            <svg viewBox="0 0 52 52">
+                <polyline points="14,27 22,35 38,17"/>
+            </svg>
+        </div>
+        <p class="success-text">Decrypted Successfully</p>
+    </div>
+
+    <!-- STEP 3: Message -->
+    <div id="messageScreen">
+        <div class="message-box">{{ message }}</div>
+        <div class="btn-group">
+            <button onclick="copyMessage()">Copy Message</button>
+            <a href="/" class="btn">New QR</a>
+        </div>
+    </div>
+
 </div>
 
 <script>
-function copyMessage() {
-    const text = `{{ message }}`;
-    navigator.clipboard.writeText(text).then(() => {
-        const btn = document.querySelector("button");
-        btn.innerHTML = "Copied ✓";
-        setTimeout(() => btn.innerHTML = "Copy Message", 2000);
-    });
-}
+    // Step 1 → Step 2 → Step 3
+    setTimeout(() => {
+        document.getElementById("loadingScreen").style.display = "none";
+        const success = document.getElementById("successScreen");
+        success.style.display = "flex";
+
+        // Step 2 → Step 3
+        setTimeout(() => {
+            success.style.display = "none";
+            document.getElementById("messageScreen").style.display = "flex";
+        }, 1800);
+
+    }, 1500);
+
+    function copyMessage() {
+        const text = {{ message | tojson }};
+        navigator.clipboard.writeText(text).then(() => {
+            const btn = document.querySelector("button");
+            btn.innerHTML = "Copied ✓";
+            setTimeout(() => btn.innerHTML = "Copy Message", 2000);
+        });
+    }
 </script>
 </body>
 </html>
