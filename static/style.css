@@ -1,127 +1,83 @@
-/* ===== BODY BACKGROUND ===== */
+/* Reset & Base */
+* {
+    box-sizing: border-box;
+    font-family: "Segoe UI", Arial, sans-serif;
+}
+
 body {
     margin: 0;
-    font-family: 'Segoe UI', sans-serif;
-    background: linear-gradient(to right, #8B0000, #1a0000);
+    background: linear-gradient(135deg, #a80000, #2b0000);
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    min-height: 100vh; /* better than height for mobile */
 }
 
-/* ===== CARD ===== */
+/* Card */
 .card {
-    background: white;
-    width: 500px;
+    background: #f3f3f3;
     padding: 40px;
-    border-radius: 20px;
-    box-shadow: 0 25px 60px rgba(0,0,0,0.4);
-    animation: fadeIn 0.6s ease-in-out;
-}
-
-/* ===== TITLE ===== */
-.card h1 {
+    width: 600px;
+    max-width: 90%;
+    border-radius: 30px;
     text-align: center;
-    margin-bottom: 25px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+}
+
+/* Title */
+.card h1 {
     color: #111;
+    margin-bottom: 25px;
+    font-weight: 700;
+    font-size: 22px;
+    white-space: nowrap;
 }
 
-/* ===== TEXTAREA ===== */
-textarea {
+/* Inputs */
+textarea,
+input {
     width: 100%;
     padding: 15px;
-    border-radius: 12px;
-    border: 1px solid #ccc;
+    border-radius: 18px;
+    border: 1px solid #ddd;
+    font-size: 16px;
     margin-bottom: 20px;
-    font-size: 15px;
-    resize: none;
-    transition: 0.3s;
-}
-
-/* ===== PASSWORD INPUT ===== */
-input[type="password"] {
-    width: 100%;
-    padding: 15px;
-    border-radius: 12px;
-    border: 1px solid #ccc;
-    margin-bottom: 20px;
-    font-size: 15px;
-    transition: 0.3s;
-}
-
-/* ===== FOCUS EFFECT ===== */
-textarea:focus,
-input[type="password"]:focus {
     outline: none;
-    border-color: #d71920;
-    box-shadow: 0 0 10px rgba(215, 25, 32, 0.4);
 }
 
-/* ===== PLACEHOLDER STYLE ===== */
-textarea::placeholder,
-input::placeholder {
-    color: #888;
-    font-size: 14px;
+/* Focus effect */
+textarea:focus,
+input:focus {
+    border-color: #e31818;
+    box-shadow: 0 0 0 3px rgba(227, 24, 24, 0.15);
 }
 
-/* ===== BUTTON BASE ===== */
+/* Textarea specific */
+textarea {
+    height: 90px;
+    resize: none;
+}
+
+/* Button */
 button {
     width: 100%;
-    padding: 14px;
-    border-radius: 12px;
+    padding: 15px;
+    border-radius: 18px;
     border: none;
-    font-size: 16px;
-    font-weight: bold;
-    margin-top: 10px;
+    background: #e31818;
+    color: white;
+    font-size: 18px;
+    font-weight: 600;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: background 0.2s ease, transform 0.1s ease;
 }
 
-/* ===== GENERATE BUTTON ===== */
-.btn-generate {
-    background: #d71920;
-    color: white;
+/* Button hover */
+button:hover {
+    background: #c51414;
 }
 
-.btn-generate:hover {
-    background: #ff2c2c;
-    transform: translateY(-3px);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.3);
-}
-
-/* ===== DECRYPT BUTTON ===== */
-.btn-decrypt {
-    background: black;
-    color: white;
-}
-
-.btn-decrypt:hover {
-    background: #333;
-    transform: translateY(-3px);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.3);
-}
-
-/* ===== QR SECTION ===== */
-.qr-section {
-    text-align: center;
-    margin-top: 25px;
-}
-
-/* ===== QR IMAGE STYLE ===== */
-.qr-image {
-    width: 220px;
-    border-radius: 15px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.4);
-    animation: pop 0.4s ease;
-}
-
-/* ===== ANIMATIONS ===== */
-@keyframes fadeIn {
-    from {opacity: 0; transform: translateY(20px);}
-    to {opacity: 1; transform: translateY(0);}
-}
-
-@keyframes pop {
-    from {transform: scale(0.8); opacity: 0;}
-    to {transform: scale(1); opacity: 1;}
+/* Button click effect */
+button:active {
+    transform: scale(0.98);
 }

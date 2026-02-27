@@ -3,11 +3,41 @@
 <head>
     <title>Your Secure QR</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .qr-container {
+            animation: fadeIn 0.8s ease-in-out;
+        }
+
+        .qr-image-large {
+            width: 280px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(255, 0, 0, 0.4);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+    </style>
 </head>
+
 <body>
 
-    <div class="qr-only">
-        <h2>Scan This QR Code</h2>
+    <div class="qr-container">
         <img src="{{ url_for('static', filename='qr.png') }}" class="qr-image-large">
     </div>
 

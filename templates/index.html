@@ -1,34 +1,119 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Secure QR System</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<meta charset="UTF-8">
+<title>Secure QR Code Generator</title>
+
+<style>
+
+* {
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display",
+                 "Segoe UI", Roboto, sans-serif;
+}
+
+body {
+    margin: 0;
+    background: linear-gradient(135deg, #e00000, #0a0a0a);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+/* Card */
+.card {
+    background: rgba(0, 0, 0, 0.94);
+    padding: 60px;
+    width: 650px;
+    max-width: 92%;
+    border-radius: 30px;
+    text-align: center;
+    box-shadow: 0 30px 80px rgba(255, 0, 0, 0.35);
+    backdrop-filter: blur(10px);
+}
+
+/* Title (UNCHANGED) */
+h1 {
+    color: #ffffff;
+    margin-bottom: 50px;
+    font-weight: 800;
+    font-size: 40px;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+}
+
+/* Form elements */
+textarea,
+input,
+button {
+    width: 100%;
+    padding: 18px;
+    border-radius: 18px;
+    border: none;
+    font-size: 18px;
+    display: block;
+}
+
+textarea {
+    height: 70px;
+    resize: none;
+    margin-bottom: 25px;
+    background: #eaeaea;
+    color: #000;
+}
+
+input {
+    margin-bottom: 30px;
+    background: #eaeaea;
+    color: #000;
+}
+
+/* Button */
+button {
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    background: linear-gradient(90deg, #ff1a1a, #990000);
+    color: white;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+/* Click animation */
+button:active {
+    transform: scale(0.95);
+}
+
+/* Hover */
+button:hover {
+    transform: scale(1.04);
+    box-shadow: 0 15px 40px rgba(255, 0, 0, 0.6);
+}
+
+</style>
 </head>
 
 <body>
 
-    <div class="card">
-        <h1>Secure QR Code Generator</h1>
+<div class="card">
+    <h1>SECURE QR CODE GENERATOR</h1>
 
-        <form method="POST" action="/generate">
+    <!-- FORM CONNECTED TO FLASK -->
+    <form method="POST" action="/generate" onsubmit="showLoading()">
+        <textarea name="message" placeholder="Enter Confidential Message" required></textarea>
+        <input type="password" name="password" placeholder="Enter Password" required>
+        <button type="submit" id="generateBtn">Generate QR</button>
+    </form>
+</div>
 
-            <textarea 
-                name="message" 
-                placeholder="Enter Confidential Message"
-                required></textarea>
-
-            <input 
-                type="password" 
-                name="password" 
-                placeholder="Enter Password"
-                required>
-
-            <button type="submit" class="btn-generate">
-                Generate QR
-            </button>
-
-        </form>
-    </div>
+<script>
+function showLoading() {
+    const btn = document.getElementById("generateBtn");
+    btn.innerHTML = "Generating...";
+    btn.style.opacity = "0.8";
+}
+</script>
 
 </body>
 </html>
