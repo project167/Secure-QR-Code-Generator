@@ -4,6 +4,7 @@ import qrcode
 import io
 import base64
 import hashlib
+from urllib.parse import quote, unquote
 
 app = Flask(__name__)
 
@@ -25,14 +26,18 @@ def generate():
     if not message or not password:
         return "Message and password required"
 
-    # Generate key from password
     key = generate_key_from_password(password)
     f = Fernet(key)
 
     encrypted_message = f.encrypt(message.encode()).decode()
 
-    # QR will contain encrypted message directly
-    qr = qrcode.make(encrypted_message)
+    # Encode token for URL safety
+    safe_token = quote(encrypted_message)
+
+    # FULL URL inside QR (IMPORTANT)
+    full_url = request.url_root + "decrypt/" + safe_token
+
+    qr = qrcode.make(full_url)
 
     buffer = io.BytesIO()
     qr.save(buffer, format="PNG")
@@ -43,20 +48,21 @@ def generate():
     return render_template("qr.html", qr_image=img_str)
 
 
-@app.route("/decrypt", methods=["GET", "POST"])
-def decrypt():
+@app.route("/decrypt/<path:token>", methods=["GET", "POST"])
+def decrypt(token):
+
+    token = unquote(token)
 
     if request.method == "POST":
-        encrypted_message = request.form.get("encrypted_message")
         password = request.form.get("password")
 
         try:
             key = generate_key_from_password(password)
             f = Fernet(key)
-            decrypted = f.decrypt(encrypted_message.encode()).decode()
+            decrypted = f.decrypt(token.encode()).decode()
             return render_template("message.html", message=decrypted)
         except Exception:
-            return "Wrong Password or Invalid QR"
+            return "Wrong Password"
 
     return render_template("password.html")
 
