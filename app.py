@@ -3,12 +3,14 @@ from cryptography.fernet import Fernet
 import qrcode
 import io
 import base64
-from urllib.parse import quote, unquote
+import hashlib
 
 app = Flask(__name__)
 
-# Temporary in-memory storage
-messages = {}
+
+def generate_key_from_password(password):
+    return base64.urlsafe_b64encode(hashlib.sha256(password.encode()).digest())
+
 
 @app.route("/")
 def home():
@@ -23,26 +25,14 @@ def generate():
     if not message or not password:
         return "Message and password required"
 
-    # Generate encryption key
-    key = Fernet.generate_key()
+    # Generate key from password
+    key = generate_key_from_password(password)
     f = Fernet(key)
 
     encrypted_message = f.encrypt(message.encode()).decode()
 
-    # Store using ORIGINAL encrypted string as key
-    messages[encrypted_message] = {
-        "password": password,
-        "key": key.decode()
-    }
-
-    # URL-safe encode token
-    safe_token = quote(encrypted_message)
-
-    # Create decrypt link
-    link = request.url_root + "decrypt/" + safe_token
-
-    # Generate QR in memory (Render safe)
-    qr = qrcode.make(link)
+    # QR will contain encrypted message directly
+    qr = qrcode.make(encrypted_message)
 
     buffer = io.BytesIO()
     qr.save(buffer, format="PNG")
@@ -53,31 +43,20 @@ def generate():
     return render_template("qr.html", qr_image=img_str)
 
 
-# IMPORTANT: use <path:token>
-@app.route("/decrypt/<path:token>", methods=["GET", "POST"])
-def decrypt(token):
-
-    # Decode URL back to original encrypted string
-    token = unquote(token)
-
-    if token not in messages:
-        return "Invalid or expired QR"
+@app.route("/decrypt", methods=["GET", "POST"])
+def decrypt():
 
     if request.method == "POST":
-        entered_password = request.form.get("password")
+        encrypted_message = request.form.get("encrypted_message")
+        password = request.form.get("password")
 
-        if entered_password == messages[token]["password"]:
-            key = messages[token]["key"].encode()
+        try:
+            key = generate_key_from_password(password)
             f = Fernet(key)
-
-            try:
-                decrypted_message = f.decrypt(token.encode()).decode()
-                return render_template("message.html", message=decrypted_message)
-            except Exception:
-                return "Decryption failed"
-
-        else:
-            return "Wrong Password"
+            decrypted = f.decrypt(encrypted_message.encode()).decode()
+            return render_template("message.html", message=decrypted)
+        except Exception:
+            return "Wrong Password or Invalid QR"
 
     return render_template("password.html")
 
