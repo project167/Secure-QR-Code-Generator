@@ -1,10 +1,132 @@
 <!DOCTYPE html>
-<html>
-<head><title>Secret Message</title></head>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Secret Message</title>
+<style>
+* {
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display",
+                 "Segoe UI", Roboto, sans-serif;
+}
+
+body {
+    margin: 0;
+    background: linear-gradient(135deg, #e00000, #0a0a0a);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.card {
+    background: rgba(0, 0, 0, 0.94);
+    padding: 60px;
+    width: 650px;
+    max-width: 92%;
+    border-radius: 30px;
+    text-align: center;
+    box-shadow: 0 30px 80px rgba(255, 0, 0, 0.35);
+    backdrop-filter: blur(10px);
+    animation: fadeIn 0.6s ease-in-out;
+}
+
+h1 {
+    color: #ffffff;
+    margin-bottom: 30px;
+    font-weight: 800;
+    font-size: 36px;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+}
+
+.unlock-icon {
+    font-size: 60px;
+    margin-bottom: 20px;
+}
+
+.message-box {
+    background: #eaeaea;
+    color: #000;
+    padding: 25px 30px;
+    border-radius: 18px;
+    font-size: 20px;
+    line-height: 1.6;
+    margin-bottom: 35px;
+    word-break: break-word;
+    text-align: left;
+}
+
+.btn-group {
+    display: flex;
+    gap: 15px;
+}
+
+button, a.btn {
+    flex: 1;
+    padding: 18px;
+    border-radius: 18px;
+    border: none;
+    font-size: 16px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+}
+
+button {
+    background: linear-gradient(90deg, #ff1a1a, #990000);
+    color: white;
+}
+
+a.btn {
+    background: rgba(255,255,255,0.08);
+    color: #ccc;
+    border: 1px solid #333;
+}
+
+button:hover, a.btn:hover {
+    transform: scale(1.04);
+    box-shadow: 0 15px 40px rgba(255, 0, 0, 0.4);
+}
+
+button:active, a.btn:active {
+    transform: scale(0.95);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+</style>
+</head>
+
 <body>
-    <h2>Your Secret Message:</h2>
-    <p>{{ message }}</p>
-    <br>
-    <a href="/">Generate another</a>
+<div class="card">
+    <div class="unlock-icon">🔓</div>
+    <h1>Secret Message</h1>
+
+    <div class="message-box">{{ message }}</div>
+
+    <div class="btn-group">
+        <button onclick="copyMessage()">Copy Message</button>
+        <a href="/" class="btn">New QR</a>
+    </div>
+</div>
+
+<script>
+function copyMessage() {
+    const text = `{{ message }}`;
+    navigator.clipboard.writeText(text).then(() => {
+        const btn = document.querySelector("button");
+        btn.innerHTML = "Copied ✓";
+        setTimeout(() => btn.innerHTML = "Copy Message", 2000);
+    });
+}
+</script>
 </body>
 </html>
