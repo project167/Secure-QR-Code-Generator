@@ -30,7 +30,6 @@ body {
     backdrop-filter: blur(10px);
 }
 
-/* ── LOADING SPINNER SCREEN ── */
 #loadingScreen {
     display: flex;
     flex-direction: column;
@@ -54,7 +53,6 @@ body {
     text-transform: uppercase;
 }
 
-/* ── GREEN TICK SCREEN ── */
 #successScreen {
     display: none;
     flex-direction: column;
@@ -95,7 +93,6 @@ body {
     text-transform: uppercase;
 }
 
-/* ── MESSAGE SCREEN ── */
 #messageScreen {
     display: none;
     flex-direction: column;
@@ -116,14 +113,8 @@ body {
     width: 100%;
 }
 
-.btn-group {
-    display: flex;
-    gap: 15px;
+a.btn {
     width: 100%;
-}
-
-button, a.btn {
-    flex: 1;
     padding: 18px;
     border-radius: 18px;
     border: none;
@@ -136,29 +127,19 @@ button, a.btn {
     text-decoration: none;
     display: inline-block;
     text-align: center;
-}
-
-button {
     background: linear-gradient(90deg, #ff1a1a, #990000);
     color: white;
 }
 
-a.btn {
-    background: rgba(255,255,255,0.08);
-    color: #ccc;
-    border: 1px solid #333;
-}
-
-button:hover, a.btn:hover {
+a.btn:hover {
     transform: scale(1.04);
     box-shadow: 0 15px 40px rgba(255, 0, 0, 0.4);
 }
 
-button:active, a.btn:active {
+a.btn:active {
     transform: scale(0.95);
 }
 
-/* ── ANIMATIONS ── */
 @keyframes spin {
     to { transform: rotate(360deg); }
 }
@@ -182,13 +163,11 @@ button:active, a.btn:active {
 <body>
 <div class="card">
 
-    <!-- STEP 1: Loading spinner -->
     <div id="loadingScreen">
         <div class="spinner"></div>
         <p class="loading-text">Decrypting...</p>
     </div>
 
-    <!-- STEP 2: Green tick -->
     <div id="successScreen">
         <div class="tick-circle">
             <svg viewBox="0 0 52 52">
@@ -198,40 +177,25 @@ button:active, a.btn:active {
         <p class="success-text">Decrypted Successfully</p>
     </div>
 
-    <!-- STEP 3: Message -->
     <div id="messageScreen">
         <div class="message-box">{{ message }}</div>
-        <div class="btn-group">
-            <button onclick="copyMessage()">Copy Message</button>
-            <a href="/" class="btn">New QR</a>
-        </div>
+        <a href="/" class="btn">New QR</a>
     </div>
 
 </div>
 
 <script>
-    // Step 1 → Step 2 → Step 3
     setTimeout(() => {
         document.getElementById("loadingScreen").style.display = "none";
         const success = document.getElementById("successScreen");
         success.style.display = "flex";
 
-        // Step 2 → Step 3
         setTimeout(() => {
             success.style.display = "none";
             document.getElementById("messageScreen").style.display = "flex";
         }, 1800);
 
     }, 1500);
-
-    function copyMessage() {
-        const text = {{ message | tojson }};
-        navigator.clipboard.writeText(text).then(() => {
-            const btn = document.querySelector("button");
-            btn.innerHTML = "Copied ✓";
-            setTimeout(() => btn.innerHTML = "Copy Message", 2000);
-        });
-    }
 </script>
 </body>
 </html>
