@@ -38,7 +38,7 @@
 <body>
 
     <div class="qr-container">
-        <img src="{{ url_for('static', filename='qr.png') }}" class="qr-image-large">
+        <img src="data:image/png;base64,{{ qr_image }}" class="qr-image-large">
     </div>
 
 </body>
